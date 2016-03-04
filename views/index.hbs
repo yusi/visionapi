@@ -1,0 +1,9 @@
+<h1>{{title}}</h1>
+<p>Welcome to {{title}}</p>
+<form action="/up" enctype="multipart/form-data" method="post">
+  <input type="file" accept="image/*;capture=camera" name="img" id="img">
+  <input type="submit" value="送信">
+</form>
+<img src='{{upfile}}' /><br />
+{{vision_response}}
+
