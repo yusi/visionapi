@@ -35,5 +35,6 @@ jspm_packages
 
 #config file
 config/default.json
+config
 
 uploads
