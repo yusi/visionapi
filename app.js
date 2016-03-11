@@ -47,18 +47,21 @@ var apikey = config.api.key;
 app.post('/up', type, function(req, res){
     console.log('path='+req.file.path); //form files
     var image;
+    var image_data;
     async.series([
       function (callback) {
         encode(req.file.path, function(err, string){
           //console.log('string='+string); //form files
-          //image = 'data:image/jpg;base64,' + string;
+          image_data = 'data:image/jpg;base64,' + string;
           image = string;
           callback(null, "first");
         })
       }
       , function (callback) {
+        var api_uri = 'https://vision.googleapis.com/v1/images:annotate?key=' + apikey;
+        console.log(api_uri);
         reuestOption = {
-          uri: 'https://vision.googleapis.com/v1/images:annotate?key=' + apikey,
+          uri: api_uri,
           headers: {'Content-Type': 'application/json'},
           json:{
             "requests":[
@@ -77,18 +80,22 @@ app.post('/up', type, function(req, res){
           }
         };
         request.post(reuestOption, function (error, response, body) {
+          vision_json = JSON.stringify(response.body, null, '  ');
+          //vision_json = JSON.stringify(response);
+          console.log(vision_json);
           if (!error && response.statusCode == 200) {
-            vision_json = JSON.stringify(body.responses);
-            console.log(vision_json);
-
             res.render('index', 
-              { title: 'Express', 
+              { title: 'Google Vision API Result', 
                 vision_response: vision_json,
-                upfile: "/"+req.file.path
+                upfile: image_data
               });
           }else{
             console.log('respons:' + + response.statusCode);
-            res.status(200).json({ status: 'err' })
+            res.status(200).json({ 
+              status: 'err',
+              code: response.statusCode,
+              response: response.message
+            })
           }
         });
       }
